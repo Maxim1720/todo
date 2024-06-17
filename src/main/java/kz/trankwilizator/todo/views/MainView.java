@@ -29,13 +29,21 @@ public class MainView extends HorizontalLayout {
     private TasksComponent tasksComponent;
     private TaskCreateComponent taskCreateComponent;
 
+    private final Tabs tabs = new Tabs();
+
+    Tab[] tabsArray = new Tab[]{
+            new Tab("Tasks"),
+            new Tab("Create")
+    };
+
     public MainView(TaskRepository taskRepository) {
+
+        this.getStyle().setMargin("0");
+        this.getStyle().setPadding("2svh 4vw 0 4vw");
+        this.getStyle().setHeight("100svh");
+
         this.taskRepository = taskRepository;
         horizontalLayout = new HorizontalLayout();
-
-//        this.setHorizontalComponentAlignment(Alignment.CENTER);
-//        this.setAlignItems(Alignment.CENTER);
-//        this.setJustifyContentMode(JustifyContentMode.CENTER);
 
         addItemsToLayout();
         tabs();
@@ -50,6 +58,7 @@ public class MainView extends HorizontalLayout {
         );
 
         taskCreateComponent = new TaskCreateComponent((String text) -> {
+
             taskRepository.save(
                     Task.builder()
                             .body(text)
@@ -58,7 +67,7 @@ public class MainView extends HorizontalLayout {
             );
 
             tasksComponent = new TasksComponent(taskRepository);
-
+            changeTab("Tasks");
         });
 
 //        horizontalLayout.add(tasksComponent, taskCreateComponent);
@@ -66,14 +75,29 @@ public class MainView extends HorizontalLayout {
 
     }
 
+    private void changeTab(String tabLabel){
+        horizontalLayout.removeAll();
+        if (Objects.equals(tabLabel, "Tasks")) {
+            horizontalLayout.add(
+                    tasksComponent
+            );
+        } else if (Objects.equals(tabLabel,"Create")) {
+            horizontalLayout.add(
+                    taskCreateComponent
+            );
+        }
+        for (int i=0;i<tabsArray.length;i++){
+            if(Objects.equals(tabsArray[i].getLabel(), tabLabel)){
+                tabs.setSelectedIndex(i);
+            }
+        }
+    }
+
     private void tabs() {
-        Tabs tabs = new Tabs();
+
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
 
-        Tab[] tabsArray = new Tab[]{
-                new Tab("Tasks"),
-                new Tab("Create")
-        };
+
 
         tabs.add(
                 tabsArray
@@ -81,17 +105,11 @@ public class MainView extends HorizontalLayout {
 
         tabs.addSelectedChangeListener(
                 (ComponentEventListener<Tabs.SelectedChangeEvent>) selectedChangeEvent -> {
-                    horizontalLayout.removeAll();
 
-                    if (Objects.equals(selectedChangeEvent.getSelectedTab().getLabel(), "Tasks")) {
-                        horizontalLayout.add(
-                                tasksComponent
-                        );
-                    } else if (Objects.equals(selectedChangeEvent.getSelectedTab().getLabel(), "Create")) {
-                        horizontalLayout.add(
-                                taskCreateComponent
-                        );
-                    }
+                    String selected = selectedChangeEvent
+                            .getSelectedTab()
+                            .getLabel();
+                    changeTab(selected);
                 }
         );
 

@@ -31,6 +31,7 @@ public class TaskCreateComponent extends HorizontalLayout {
         addBtn.addClickListener(e -> {
             if (bodyTextField.getValue() != null) {
                 performCreate.execute(bodyTextField.getValue());
+                bodyTextField.setValue("");
             }
         });
         add(
